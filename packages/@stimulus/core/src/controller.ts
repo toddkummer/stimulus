@@ -1,3 +1,4 @@
+import { ChildPropertiesBlessing } from "./child_properties"
 import { ClassPropertiesBlessing } from "./class_properties"
 import { Constructor } from "./constructor"
 import { Context } from "./context"
@@ -7,9 +8,11 @@ import { ValuePropertiesBlessing, ValueDefinitionMap } from "./value_properties"
 export type ControllerConstructor = Constructor<Controller>
 
 export class Controller {
-  static blessings = [ ClassPropertiesBlessing, TargetPropertiesBlessing, ValuePropertiesBlessing ]
+  static blessings = [ ClassPropertiesBlessing, TargetPropertiesBlessing, ValuePropertiesBlessing, ChildPropertiesBlessing ]
   static targets: string[] = []
   static values: ValueDefinitionMap = {}
+  static parent: string = ''
+  static children: string[] = []
 
   readonly context: Context
 
@@ -43,6 +46,28 @@ export class Controller {
 
   get data() {
     return this.scope.data
+  }
+
+  get parent() {
+    return this.scope.parent
+  }
+
+  set parent(value) {
+    this.scope.parent = value
+  }
+
+  get children() {
+    return this.scope.children
+  }
+
+  handleChildConnectEvent(event: CustomEvent) {
+    const controller = event.detail.controller
+    if (controller &&
+        this.identifier === event.detail.parentIdentifier &&
+        this.context.module.relationships.childIdentifiers.includes(controller.identifier)) {
+      this.children.addChild(controller)
+      controller.parent = this
+    }
   }
 
   initialize() {

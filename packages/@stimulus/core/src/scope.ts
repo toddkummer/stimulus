@@ -5,6 +5,8 @@ import { Logger } from "./logger"
 import { Schema } from "./schema"
 import { attributeValueContainsToken } from "./selectors"
 import { TargetSet } from "./target_set"
+import { ChildrenMap } from "./children_map";
+import { Controller } from "./controller";
 
 export class Scope {
   readonly schema: Schema
@@ -14,6 +16,8 @@ export class Scope {
   readonly targets = new TargetSet(this)
   readonly classes = new ClassMap(this)
   readonly data = new DataMap(this)
+  parent?: Controller
+  readonly children = new ChildrenMap(this)
 
   constructor(schema: Schema, element: Element, identifier: string, logger: Logger) {
     this.schema = schema

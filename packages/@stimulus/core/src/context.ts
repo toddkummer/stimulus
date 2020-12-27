@@ -7,6 +7,7 @@ import { Module } from "./module"
 import { Schema } from "./schema"
 import { Scope } from "./scope"
 import { ValueObserver } from "./value_observer"
+import { ParentChildConnector } from "./parent_child_connector";
 
 export class Context implements ErrorHandler {
   readonly module: Module
@@ -14,6 +15,7 @@ export class Context implements ErrorHandler {
   readonly controller: Controller
   private bindingObserver: BindingObserver
   private valueObserver: ValueObserver
+  private parentChildConnector: ParentChildConnector
 
   constructor(module: Module, scope: Scope) {
     this.module = module
@@ -21,6 +23,7 @@ export class Context implements ErrorHandler {
     this.controller = new module.controllerConstructor(this)
     this.bindingObserver = new BindingObserver(this, this.dispatcher)
     this.valueObserver = new ValueObserver(this, this.controller)
+    this.parentChildConnector = new ParentChildConnector(this, this.dispatcher)
 
     try {
       this.controller.initialize()
@@ -32,6 +35,7 @@ export class Context implements ErrorHandler {
   connect() {
     this.bindingObserver.start()
     this.valueObserver.start()
+    this.parentChildConnector.start()
 
     try {
       this.controller.connect()
@@ -49,6 +53,7 @@ export class Context implements ErrorHandler {
 
     this.valueObserver.stop()
     this.bindingObserver.stop()
+    this.parentChildConnector.stop()
   }
 
   get application(): Application {

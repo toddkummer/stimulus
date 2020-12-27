@@ -8,6 +8,17 @@ export function readInheritableStaticArrayValues<T, U = string>(constructor: Con
   }, new Set as Set<U>))
 }
 
+export function readInheritableStaticValue<T, U = string>(constructor: Constructor<T>, propertyName: string) {
+  while(constructor) {
+    const propertyValue = (constructor as any)[propertyName]
+    if(propertyValue) {
+      return propertyValue
+    }
+    constructor = Object.getPrototypeOf(constructor)
+  }
+  return ''
+}
+
 export function readInheritableStaticObjectPairs<T, U>(constructor: Constructor<T>, propertyName: string) {
   const ancestors = getAncestorsForConstructor(constructor)
   return ancestors.reduce((pairs, constructor) => {

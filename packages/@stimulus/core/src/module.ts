@@ -2,17 +2,20 @@ import { Application } from "./application"
 import { Context } from "./context"
 import { ControllerConstructor } from "./controller"
 import { Definition, blessDefinition } from "./definition"
+import { Relationships, buildRelationships } from "./relationships";
 import { Scope } from "./scope"
 
 export class Module {
   readonly application: Application
   readonly definition: Definition
+  readonly relationships: Relationships
   private contextsByScope: WeakMap<Scope, Context>
   private connectedContexts: Set<Context>
 
   constructor(application: Application, definition: Definition) {
     this.application = application
     this.definition = blessDefinition(definition)
+    this.relationships = buildRelationships(definition.controllerConstructor)
     this.contextsByScope = new WeakMap
     this.connectedContexts = new Set
   }
