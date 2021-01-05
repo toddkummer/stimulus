@@ -1,5 +1,6 @@
 import { ControllerTestCase } from "../cases/controller_test_case"
 import {ItemsController, ItemController, StatusBoxController} from "../controllers/parent_controller"
+import {Controller} from "../../controller";
 
 export default class ParentChildTests extends ControllerTestCase() {
   setupApplication() {
@@ -28,6 +29,10 @@ export default class ParentChildTests extends ControllerTestCase() {
     } else {
       throw new Error("no status box controller connected")
     }
+  }
+
+  get childControllers(): Controller[] {
+    return this.controllers.filter(controller => controller.identifier != 'items') as Controller[]
   }
 
   fixtureHTML = `
@@ -75,8 +80,7 @@ export default class ParentChildTests extends ControllerTestCase() {
   }
 
   "test each child controller assigned its parent"() {
-    const childControllers = this.childItemControllers.concat([this.childStatusBoxController])
-    childControllers.forEach(childController => {
+    this.childControllers.forEach(childController => {
       this.assert.equal(this.parentController, childController.parent)
     })
   }
