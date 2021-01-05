@@ -8,6 +8,8 @@ import { Schema } from "./schema"
 import { Scope } from "./scope"
 import { ValueObserver } from "./value_observer"
 import { ParentChildConnector } from "./parent_child_connector";
+import { withControllerRegistrationCallbacks } from "./controller_callbacks";
+import {camelize, capitalize} from "./string_helpers";
 
 export class Context implements ErrorHandler {
   readonly module: Module
@@ -54,6 +56,18 @@ export class Context implements ErrorHandler {
     this.valueObserver.stop()
     this.bindingObserver.stop()
     this.parentChildConnector.stop()
+  }
+
+  registerChild(childController: Controller) {
+    const childName = camelize(childController.identifier)
+    withControllerRegistrationCallbacks(this.controller,
+        `${capitalize(childName)}ChildRegistration`,
+        childController,
+        () => { this.scope.children.addChild(childName, childController) })
+    withControllerRegistrationCallbacks(childController,
+        'ParentRegistration',
+        this.controller,
+        () => childController.parent = this.controller)
   }
 
   get application(): Application {
