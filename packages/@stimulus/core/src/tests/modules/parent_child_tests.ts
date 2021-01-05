@@ -84,4 +84,30 @@ export default class ParentChildTests extends ControllerTestCase() {
       this.assert.equal(this.parentController, childController.parent)
     })
   }
+
+  "test before callback invoked for parent registration with parent as param"() {
+    const parent = this.parentController
+    this.childItemControllers.forEach(controller => {
+      this.assert.equal(controller.beforeParameter, parent)
+    })
+  }
+
+  "test after callback invoked for parent registration with parent as param"() {
+    const parent = this.parentController
+    this.childItemControllers.forEach(controller => {
+      this.assert.equal(controller.afterParameter, parent)
+    })
+  }
+
+  "test before callback invoked for child registration"() {
+    this.childItemControllers.forEach(controller => {
+      this.assert.ok(controller.parentBeforeCallbackInvoked)
+    })
+  }
+
+  "test after callback invoked for item child"() {
+    this.childItemControllers.forEach(controller => {
+      this.assert.ok(controller.parentAfterCallbackInvoked)
+    })
+  }
 }

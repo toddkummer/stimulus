@@ -65,8 +65,7 @@ export class Controller {
     if (controller &&
         this.identifier === event.detail.parentIdentifier &&
         this.context.module.relationships.childIdentifiers.includes(controller.identifier)) {
-      this.children.addChild(controller)
-      controller.parent = this
+      this.context.registerChild(controller)
     }
   }
 

@@ -1,6 +1,5 @@
 import { Controller } from "./controller";
 import { Scope } from "./scope";
-import { camelize } from "./string_helpers";
 
 export class ChildrenMap {
     readonly scope: Scope
@@ -11,8 +10,7 @@ export class ChildrenMap {
         this.childrenByName = new Map
     }
 
-    addChild(controller: Controller) {
-        const name = camelize(controller.identifier)
+    addChild(name: string, controller: Controller) {
         if(!this.childrenByName.has(name)) {
             this.childrenByName.set(name, [])
         }
