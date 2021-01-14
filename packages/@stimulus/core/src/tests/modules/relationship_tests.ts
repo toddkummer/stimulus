@@ -1,8 +1,8 @@
 import { ControllerTestCase } from "../cases/controller_test_case"
-import {ItemsController, ItemController, StatusBoxController} from "../controllers/parent_controller"
-import {Controller} from "../../controller";
+import { ItemsController, ItemController, StatusBoxController } from "../controllers/relationship_controller"
+import { Controller } from "../../controller";
 
-export default class ParentChildTests extends ControllerTestCase() {
+export default class RelationshipTests extends ControllerTestCase() {
   setupApplication() {
     this.application.register('status-box', StatusBoxController)
     this.application.register('item', ItemController)
