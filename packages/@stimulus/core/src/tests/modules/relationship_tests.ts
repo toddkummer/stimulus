@@ -9,13 +9,17 @@ export default class RelationshipTests extends ControllerTestCase() {
     this.application.register('items', ItemsController)
   }
 
-  get parentController(): ItemsController {
-    const controller = this.controllers.find(controller => controller.identifier === 'items')
+  getControllerByName(identifier: string) {
+    const controller = this.controllers.find(controller => controller.identifier === identifier)
     if (controller) {
-      return controller as ItemsController
+      return controller as Controller
     } else {
-      throw new Error("no parent controller connected")
+      throw new Error(`no ${identifier} controller connected`)
     }
+  }
+
+  get parentController(): ItemsController {
+    return this.getControllerByName('items') as ItemsController
   }
 
   get childItemControllers(): ItemController[] {
@@ -23,12 +27,7 @@ export default class RelationshipTests extends ControllerTestCase() {
   }
 
   get childStatusBoxController(): StatusBoxController {
-    const controller = this.controllers.find(controller => controller.identifier === 'status-box')
-    if (controller) {
-      return controller as StatusBoxController
-    } else {
-      throw new Error("no status box controller connected")
-    }
+    return this.getControllerByName('status-box') as StatusBoxController
   }
 
   get childControllers(): Controller[] {
