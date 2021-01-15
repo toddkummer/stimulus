@@ -1,7 +1,7 @@
 import { Controller } from "./controller";
 import { Scope } from "./scope";
 
-export class ChildrenMap {
+export class RelationsMap {
     readonly scope: Scope
     private childrenByName: Map<string, Controller[]>
 

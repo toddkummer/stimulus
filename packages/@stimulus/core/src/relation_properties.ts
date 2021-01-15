@@ -3,7 +3,7 @@ import { Controller } from "./controller"
 import { readInheritableStaticArrayValues } from "./inheritable_statics"
 
 /** @hidden */
-export function ChildPropertiesBlessing<T>(constructor: Constructor<T>) {
+export function RelationPropertiesBlessing<T>(constructor: Constructor<T>) {
   const children = readInheritableStaticArrayValues(constructor, "children")
   return children.reduce((properties, childDefinition) => {
     return Object.assign(properties, propertiesForChildDefinition(childDefinition))
@@ -14,7 +14,7 @@ function propertiesForChildDefinition(name: string) {
   return {
     [`${name}Child`]: {
       get(this: Controller) {
-        const children = this.children.get(name)
+        const children = this.relations.get(name)
         if (children) {
           return children[0]
         } else {
@@ -25,7 +25,7 @@ function propertiesForChildDefinition(name: string) {
 
     [`${name}Children`]: {
       get(this: Controller) {
-        return this.children.get(name)
+        return this.relations.get(name)
       }
     }
   }

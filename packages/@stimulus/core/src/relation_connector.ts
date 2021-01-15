@@ -5,10 +5,10 @@ import { Context } from "./context";
 import { Dispatcher } from "./dispatcher";
 import { Relationships } from "./relationships";
 
-export class ParentChildConnector {
+export class RelationConnector {
     readonly context: Context
     private dispatcher: Dispatcher
-    private childBinding?: Binding
+    private relationBinding?: Binding
 
     constructor(context: Context, dispatcher: Dispatcher) {
         this.context = context
@@ -17,7 +17,7 @@ export class ParentChildConnector {
 
     start() {
         if (this.childIdentifiers.length > 0) {
-            this.connectChildConnectHandler()
+            this.connectRelationConnectHandler()
         }
 
         if (this.parentIdentifier) {
@@ -26,32 +26,32 @@ export class ParentChildConnector {
     }
 
     stop() {
-        if (this.childBinding) {
-            this.disconnectChildConnectHandler()
+        if (this.relationBinding) {
+            this.disconnectRelationConnectHandler()
         }
     }
 
-    private connectChildConnectHandler() {
-        const binding = new Binding(this.context, this.childConnectAction)
-        this.childBinding = binding
+    private connectRelationConnectHandler() {
+        const binding = new Binding(this.context, this.relationConnectAction)
+        this.relationBinding = binding
         this.dispatcher.bindingConnected(binding)
     }
 
-    private disconnectChildConnectHandler() {
-        const binding = this.childBinding
+    private disconnectRelationConnectHandler() {
+        const binding = this.relationBinding
         if (binding) {
-            this.childBinding = undefined
+            this.relationBinding = undefined
             this.dispatcher.bindingDisconnected(binding)
         }
     }
 
-    private get childConnectAction(): Action {
+    private get relationConnectAction(): Action {
         const actionDescriptor =  {
             eventTarget: this.context.element,
             eventOptions: {},
             eventName: 'connect',
             identifier: this.context.identifier,
-            methodName: 'handleChildConnectEvent'
+            methodName: 'handleRelationConnectEvent'
         } as ActionDescriptor
         return new Action(this.context.element, 0, actionDescriptor)
     }

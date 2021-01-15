@@ -7,7 +7,7 @@ import { Module } from "./module"
 import { Schema } from "./schema"
 import { Scope } from "./scope"
 import { ValueObserver } from "./value_observer"
-import { ParentChildConnector } from "./parent_child_connector";
+import { RelationConnector } from "./relation_connector";
 import { withControllerRegistrationCallbacks } from "./controller_callbacks";
 import {camelize, capitalize} from "./string_helpers";
 
@@ -17,7 +17,7 @@ export class Context implements ErrorHandler {
   readonly controller: Controller
   private bindingObserver: BindingObserver
   private valueObserver: ValueObserver
-  private parentChildConnector: ParentChildConnector
+  private relationConnector: RelationConnector
 
   constructor(module: Module, scope: Scope) {
     this.module = module
@@ -25,7 +25,7 @@ export class Context implements ErrorHandler {
     this.controller = new module.controllerConstructor(this)
     this.bindingObserver = new BindingObserver(this, this.dispatcher)
     this.valueObserver = new ValueObserver(this, this.controller)
-    this.parentChildConnector = new ParentChildConnector(this, this.dispatcher)
+    this.relationConnector = new RelationConnector(this, this.dispatcher)
 
     try {
       this.controller.initialize()
@@ -37,7 +37,7 @@ export class Context implements ErrorHandler {
   connect() {
     this.bindingObserver.start()
     this.valueObserver.start()
-    this.parentChildConnector.start()
+    this.relationConnector.start()
 
     try {
       this.controller.connect()
@@ -55,7 +55,7 @@ export class Context implements ErrorHandler {
 
     this.valueObserver.stop()
     this.bindingObserver.stop()
-    this.parentChildConnector.stop()
+    this.relationConnector.stop()
   }
 
   registerChild(childController: Controller) {
@@ -63,7 +63,7 @@ export class Context implements ErrorHandler {
     withControllerRegistrationCallbacks(this.controller,
         `${capitalize(childName)}ChildRegistration`,
         childController,
-        () => { this.scope.children.addChild(childName, childController) })
+        () => { this.scope.relations.addChild(childName, childController) })
     withControllerRegistrationCallbacks(childController,
         'ParentRegistration',
         this.controller,

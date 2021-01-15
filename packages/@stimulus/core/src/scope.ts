@@ -5,7 +5,7 @@ import { Logger } from "./logger"
 import { Schema } from "./schema"
 import { attributeValueContainsToken } from "./selectors"
 import { TargetSet } from "./target_set"
-import { ChildrenMap } from "./children_map";
+import { RelationsMap } from "./relations_map";
 import { Controller } from "./controller";
 
 export class Scope {
@@ -17,7 +17,7 @@ export class Scope {
   readonly classes = new ClassMap(this)
   readonly data = new DataMap(this)
   parent?: Controller
-  readonly children = new ChildrenMap(this)
+  readonly relations = new RelationsMap(this)
 
   constructor(schema: Schema, element: Element, identifier: string, logger: Logger) {
     this.schema = schema
