@@ -58,6 +58,12 @@ export class Context implements ErrorHandler {
     this.relationConnector.stop()
   }
 
+  register(relationship: string, controller: Controller) {
+    if (relationship == 'child') {
+      this.registerChild(controller)
+    }
+  }
+
   registerChild(childController: Controller) {
     const childName = camelize(childController.identifier)
     withControllerRegistrationCallbacks(this.controller,

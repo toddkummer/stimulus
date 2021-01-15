@@ -63,9 +63,9 @@ export class Controller {
   handleRelationConnectEvent(event: CustomEvent) {
     const controller = event.detail.controller
     if (controller &&
-        this.identifier === event.detail.parentIdentifier &&
-        this.context.module.relationships.childIdentifiers.includes(controller.identifier)) {
-      this.context.registerChild(controller)
+        this.identifier === event.detail.targetIdentifier &&
+        this.context.module.relationships.related(event.detail.connectAs, controller.identifier)) {
+      this.context.register(event.detail.connectAs, controller)
     }
   }
 

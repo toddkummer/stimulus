@@ -69,7 +69,7 @@ export class RelationConnector {
     }
 
     private dispatchChildConnectEvent() {
-        const info = { controller: this.context.controller, parentIdentifier: this.parentIdentifier }
+        const info = { controller: this.context.controller, connectAs: 'child', targetIdentifier: this.parentIdentifier }
         this.context.element.dispatchEvent(
             new CustomEvent('connect', { bubbles: true, detail: info })
         )
