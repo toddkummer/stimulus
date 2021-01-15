@@ -5,16 +5,20 @@ import { readInheritableStaticArrayValues } from "./inheritable_statics"
 /** @hidden */
 export function RelationPropertiesBlessing<T>(constructor: Constructor<T>) {
   const children = readInheritableStaticArrayValues(constructor, "children")
-  return children.reduce((properties, childDefinition) => {
+  const siblings = readInheritableStaticArrayValues(constructor, "siblings")
+
+  return siblings.reduce((properties, name) => {
+    return Object.assign(properties, propertyForSiblingDefinition(name))
+  }, children.reduce((properties, childDefinition) => {
     return Object.assign(properties, propertiesForChildDefinition(childDefinition))
-  }, { declaredChildren: children } as PropertyDescriptorMap)
+  }, {} as PropertyDescriptorMap))
 }
 
 function propertiesForChildDefinition(name: string) {
   return {
     [`${name}Child`]: {
       get(this: Controller) {
-        const children = this.relations.get(name)
+        const children = this.relations.getChildren(name)
         if (children) {
           return children[0]
         } else {
@@ -25,7 +29,28 @@ function propertiesForChildDefinition(name: string) {
 
     [`${name}Children`]: {
       get(this: Controller) {
-        return this.relations.get(name)
+        return this.relations.getChildren(name)
+      }
+    }
+  }
+}
+
+function propertyForSiblingDefinition(name: string) {
+  return {
+    [`${name}Sibling`]: {
+      get(this: Controller) {
+        const siblings = this.relations.getSiblings(name)
+        if (siblings) {
+          return siblings[0]
+        } else {
+          throw new Error(`Missing sibling "${name}" for "${this.identifier}" controller`)
+        }
+      }
+    },
+
+    [`${name}Siblings`]: {
+      get(this: Controller) {
+        return this.relations.getSiblings(name)
       }
     }
   }

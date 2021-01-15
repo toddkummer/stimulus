@@ -8,7 +8,8 @@ import { Relationships } from "./relationships";
 export class RelationConnector {
     readonly context: Context
     private dispatcher: Dispatcher
-    private relationBinding?: Binding
+    private childBinding?: Binding
+    private siblingBinding?: Binding
 
     constructor(context: Context, dispatcher: Dispatcher) {
         this.context = context
@@ -17,7 +18,15 @@ export class RelationConnector {
 
     start() {
         if (this.childIdentifiers.length > 0) {
-            this.connectRelationConnectHandler()
+            this.childBinding = this.bindConnectHandler(this.context.element)
+        }
+
+        if (this.siblingIdentifiers.length > 0) {
+            this.siblingBinding = this.bindConnectHandler(this.context.application.element)
+
+            this.siblingIdentifiers.forEach(sibling => {
+                this.dispatchSiblingConnectEvent(sibling)
+            })
         }
 
         if (this.parentIdentifier) {
@@ -26,28 +35,35 @@ export class RelationConnector {
     }
 
     stop() {
-        if (this.relationBinding) {
-            this.disconnectRelationConnectHandler()
-        }
+        this.disconnectChildConnectHandler()
+        this.disconnectSiblingConnectHandler()
     }
 
-    private connectRelationConnectHandler() {
-        const binding = new Binding(this.context, this.relationConnectAction)
-        this.relationBinding = binding
+    private bindConnectHandler(element: Element): Binding {
+        const binding = new Binding(this.context, this.relationConnectAction(element))
         this.dispatcher.bindingConnected(binding)
+        return binding
     }
 
-    private disconnectRelationConnectHandler() {
-        const binding = this.relationBinding
+    private disconnectChildConnectHandler() {
+        const binding = this.childBinding
         if (binding) {
-            this.relationBinding = undefined
+            this.childBinding = undefined
             this.dispatcher.bindingDisconnected(binding)
         }
     }
 
-    private get relationConnectAction(): Action {
+    private disconnectSiblingConnectHandler() {
+        const binding = this.siblingBinding
+        if (binding) {
+            this.siblingBinding = undefined
+            this.dispatcher.bindingDisconnected(binding)
+        }
+    }
+
+    private relationConnectAction(eventTarget: EventTarget): Action {
         const actionDescriptor =  {
-            eventTarget: this.context.element,
+            eventTarget: eventTarget,
             eventOptions: {},
             eventName: 'connect',
             identifier: this.context.identifier,
@@ -60,6 +76,10 @@ export class RelationConnector {
         return this.relationships.childIdentifiers
     }
 
+    private get siblingIdentifiers(): string[] {
+        return this.relationships.siblingIdentifiers
+    }
+
     private get parentIdentifier(): string {
         return this.relationships.parentIdentifier
     }
@@ -70,6 +90,13 @@ export class RelationConnector {
 
     private dispatchChildConnectEvent() {
         const info = { controller: this.context.controller, connectAs: 'child', targetIdentifier: this.parentIdentifier }
+        this.context.element.dispatchEvent(
+            new CustomEvent('connect', { bubbles: true, detail: info })
+        )
+    }
+
+    private dispatchSiblingConnectEvent(name: string) {
+        const info = { controller: this.context.controller, connectAs: 'sibling', targetIdentifier: name }
         this.context.element.dispatchEvent(
             new CustomEvent('connect', { bubbles: true, detail: info })
         )

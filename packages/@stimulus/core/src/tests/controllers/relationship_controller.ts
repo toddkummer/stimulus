@@ -11,7 +11,10 @@ export class ItemsController extends BaseItemsController {
     static siblings = ["configuration"]
     static children = ["statusBox"]
 
-    configurationController!: ConfigurationController
+    siblingBeforeCallbackInvoked = false
+    siblingAfterCallbackInvoked = false
+
+    configurationSibling!: ConfigurationController
 
     statusBoxChildren!: StatusBoxController[]
     statusBoxChild!: StatusBoxController
@@ -24,11 +27,11 @@ export class ItemsController extends BaseItemsController {
         controller.parentAfterCallbackInvoked = true
     }
 
-    beforeSiblingRegistration(controller: ConfigurationController) {
+    beforeConfigurationSiblingRegistration(controller: ConfigurationController) {
         controller.siblingBeforeCallbackInvoked = true
     }
 
-    afterSiblingRegistration(controller: ConfigurationController) {
+    afterConfigurationSiblingRegistration(controller: ConfigurationController) {
         controller.siblingAfterCallbackInvoked = true
     }
 }
@@ -39,7 +42,15 @@ export class ConfigurationController extends Controller {
     siblingBeforeCallbackInvoked = false
     siblingAfterCallbackInvoked = false
 
-    itemsController!: ItemsController
+    itemsSibling!: ItemsController
+
+    beforeItemsSiblingRegistration(controller: ItemsController) {
+        controller.siblingBeforeCallbackInvoked = true
+    }
+
+    afterItemsSiblingRegistration(controller: ItemsController) {
+        controller.siblingAfterCallbackInvoked = true
+    }
 }
 
 export class ItemController extends Controller {

@@ -7,6 +7,7 @@ export default class RelationshipTests extends ControllerTestCase() {
     this.application.register('status-box', StatusBoxController)
     this.application.register('item', ItemController)
     this.application.register('items', ItemsController)
+    this.application.register('configuration', ConfigurationController)
   }
 
   getControllerByName(identifier: string) {
@@ -35,7 +36,7 @@ export default class RelationshipTests extends ControllerTestCase() {
   }
 
   get childControllers(): Controller[] {
-    return this.controllers.filter(controller => controller.identifier != 'items') as Controller[]
+    return this.controllers.filter(controller => ['status-box', 'item'].includes(controller.identifier)) as Controller[]
   }
 
   get configurationController(): ConfigurationController {
@@ -119,19 +120,27 @@ export default class RelationshipTests extends ControllerTestCase() {
     })
   }
 
-  "test configuration controller available in items controller"() {
-    this.assert.equal(this.itemsController.configurationController, this.configurationController)
+  "test configuration controller available in items controller as sibling"() {
+    this.assert.equal(this.itemsController.configurationSibling, this.configurationController)
   }
 
-  "test items controller available in configuration controller"() {
-    this.assert.equal(this.configurationController.itemsController, this.itemsController)
+  "test items controller available in configuration controller as sibling"() {
+    this.assert.equal(this.configurationController.itemsSibling, this.itemsController)
   }
 
-  "test before callback invoked for sibling registration"() {
+  "test before callback invoked for on configuration for sibling registration"() {
     this.assert.ok(this.configurationController.siblingBeforeCallbackInvoked)
   }
 
-  "test after callback invoked for sibling registration"() {
+  "test after callback invoked on configuration for sibling registration"() {
     this.assert.ok(this.configurationController.siblingAfterCallbackInvoked)
+  }
+
+  "test before callback invoked for on items for sibling registration"() {
+    this.assert.ok(this.itemsController.siblingBeforeCallbackInvoked)
+  }
+
+  "test after callback invoked on items for sibling registration"() {
+    this.assert.ok(this.itemsController.siblingAfterCallbackInvoked)
   }
 }

@@ -13,6 +13,7 @@ export class Controller {
   static values: ValueDefinitionMap = {}
   static parent: string = ''
   static children: string[] = []
+  static siblings: string[] = []
 
   readonly context: Context
 
@@ -66,6 +67,10 @@ export class Controller {
         this.identifier === event.detail.targetIdentifier &&
         this.context.module.relationships.related(event.detail.connectAs, controller.identifier)) {
       this.context.register(event.detail.connectAs, controller)
+
+      if (event.detail.connectAs === "child") {
+        event.stopPropagation()
+      }
     }
   }
 

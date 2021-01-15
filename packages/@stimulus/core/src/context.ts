@@ -59,21 +59,11 @@ export class Context implements ErrorHandler {
   }
 
   register(relationship: string, controller: Controller) {
-    if (relationship == 'child') {
+    if (relationship === "child") {
       this.registerChild(controller)
+    } else if (relationship === "sibling") {
+      this.registerSibling(controller)
     }
-  }
-
-  registerChild(childController: Controller) {
-    const childName = camelize(childController.identifier)
-    withControllerRegistrationCallbacks(this.controller,
-        `${capitalize(childName)}ChildRegistration`,
-        childController,
-        () => { this.scope.relations.addChild(childName, childController) })
-    withControllerRegistrationCallbacks(childController,
-        'ParentRegistration',
-        this.controller,
-        () => childController.parent = this.controller)
   }
 
   get application(): Application {
@@ -106,5 +96,31 @@ export class Context implements ErrorHandler {
     const { identifier, controller, element } = this
     detail = Object.assign({ identifier, controller, element }, detail)
     this.application.handleError(error, `Error ${message}`, detail)
+  }
+
+  private registerChild(controller: Controller) {
+    const name = camelize(controller.identifier)
+
+    withControllerRegistrationCallbacks(this.controller,
+        `${capitalize(name)}ChildRegistration`,
+        controller,
+        () => { this.scope.relations.addChild(name, controller) })
+    withControllerRegistrationCallbacks(controller,
+        'ParentRegistration',
+        this.controller,
+        () => controller.parent = this.controller)
+  }
+
+  private registerSibling(controller: Controller) {
+    const name = camelize(controller.identifier)
+    const callbackName = `${capitalize(name)}SiblingRegistration`
+
+    withControllerRegistrationCallbacks(this.controller, callbackName, controller,
+        () => { this.controller.relations.addSibling(name, controller) })
+
+    const nameOnSibling = camelize(this.controller.identifier)
+    const callbackNameOnSibling = `${capitalize(nameOnSibling)}SiblingRegistration`
+    withControllerRegistrationCallbacks(controller, callbackNameOnSibling, this.controller,
+        () => controller.relations.addSibling(nameOnSibling, this.controller))
   }
 }
